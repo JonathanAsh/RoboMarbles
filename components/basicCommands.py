@@ -11,6 +11,8 @@ class BasicCommands(commands.Component):
     ### COMMANDS ###
     ###----------###
 
+    # TODO: add !emotes command since i turned off the streamelements bot
+
     # Switch to Be Right Back screen if mod or me
     @commands.command(name="brb")
     async def brb_command(self, ctx):

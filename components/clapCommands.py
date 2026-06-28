@@ -46,7 +46,6 @@ class ClapCommands(commands.Component):
     async def clap_command(self, ctx):
         await self.do_claps(random.randint(self.min_claps, self.max_claps))
     
-
     #  ------------------------------------------------------------------------------------------------------#
 
     ###-----------###

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import os
-import random
 
 from dotenv import load_dotenv
 from twitchio import eventsub
@@ -30,10 +29,8 @@ OBS_PORT = int(os.getenv("OBS_PORT", "4455"))
 OBS_PASSWORD = os.getenv("OBS_PASSWORD")
 
 # TODO: make twitch plays pokemon thingy, which needs:
-#         - new auth token reading channel point events
-#         - separate out component files
 #         - make new channel point redemption for blocking my input (?)
-#         - read chat inputs (or more channel points?) and input them via python
+#         - read chat inputs and input them via python
 
 class Bot(commands.Bot):
     def __init__(self):
