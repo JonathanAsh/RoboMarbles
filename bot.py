@@ -2,13 +2,17 @@ from __future__ import annotations
 
 import asyncio
 import os
+import random
 
 from dotenv import load_dotenv
 from twitchio import eventsub
 from twitchio.ext import commands
 import obsws_python as obs
 
-from components.chatCommands import ChatCommands
+from components.clapCommands import ClapCommands
+from components.twitchPlays import TwitchPlays
+from components.basicCommands import BasicCommands
+from components.redemptionEvents import RedemptionEvents
 
 load_dotenv()
 
@@ -16,12 +20,20 @@ TWITCH_CLIENT_ID = os.getenv("TWITCH_CLIENT_ID")
 TWITCH_CLIENT_SECRET = os.getenv("TWITCH_CLIENT_SECRET")
 TWITCH_BOT_ID = os.getenv("TWITCH_BOT_ID")
 TWITCH_OWNER_ID = os.getenv("TWITCH_OWNER_ID")
-TWITCH_ACCESS_TOKEN = os.getenv("TWITCH_ACCESS_TOKEN")
-TWITCH_REFRESH_TOKEN = os.getenv("TWITCH_REFRESH_TOKEN")
+TWITCH_BOT_ACCESS_TOKEN = os.getenv("TWITCH_BOT_ACCESS_TOKEN")
+TWITCH_BOT_REFRESH_TOKEN = os.getenv("TWITCH_BOT_REFRESH_TOKEN")
+TWITCH_OWNER_ACCESS_TOKEN = os.getenv("TWITCH_OWNER_ACCESS_TOKEN")
+TWITCH_OWNER_REFRESH_TOKEN = os.getenv("TWITCH_OWNER_REFRESH_TOKEN")
 
 OBS_HOST = os.getenv("OBS_HOST", "localhost")
 OBS_PORT = int(os.getenv("OBS_PORT", "4455"))
 OBS_PASSWORD = os.getenv("OBS_PASSWORD")
+
+# TODO: make twitch plays pokemon thingy, which needs:
+#         - new auth token reading channel point events
+#         - separate out component files
+#         - make new channel point redemption for blocking my input (?)
+#         - read chat inputs (or more channel points?) and input them via python
 
 class Bot(commands.Bot):
     def __init__(self):
@@ -40,20 +52,36 @@ class Bot(commands.Bot):
         )
 
     async def setup_hook(self) -> None:
-        await self.add_token(TWITCH_ACCESS_TOKEN, TWITCH_REFRESH_TOKEN)
-        await self.add_component(ChatCommands(self))
+        # Two tokens, one for chat appearance (unused currently) and another for reading channel point redemptions
+        await self.add_token(TWITCH_BOT_ACCESS_TOKEN, TWITCH_BOT_REFRESH_TOKEN)
+        await self.add_token(TWITCH_OWNER_ACCESS_TOKEN, TWITCH_OWNER_REFRESH_TOKEN)
 
-        payload = eventsub.ChatMessageSubscription(
-            broadcaster_user_id=TWITCH_OWNER_ID,
-            user_id=TWITCH_BOT_ID,
+        # Load the commands from components
+        await self.add_component(BasicCommands(self))
+        # Keep a reference to clapcommand component for channel point redemption uses
+        self.clap_commands = ClapCommands(self)
+        await self.add_component(self.clap_commands)
+        await self.add_component(TwitchPlays(self))
+        await self.add_component(RedemptionEvents(self))
+
+        # Have a look at every chat message
+        await self.subscribe_websocket(
+            payload=eventsub.ChatMessageSubscription(
+                broadcaster_user_id=TWITCH_OWNER_ID,
+                user_id=TWITCH_BOT_ID,
+            )
         )
 
-        await self.subscribe_websocket(payload=payload)
+        # Have a look at every channel point redemption
+        await self.subscribe_websocket(
+            payload=eventsub.ChannelPointsRedeemAddSubscription(
+                broadcaster_user_id=TWITCH_OWNER_ID,
+            )
+        )
 
     async def event_ready(self):
         print(f"Logged in as bot user ID: {TWITCH_BOT_ID}")
         print(f"Listening to channel user ID: {TWITCH_OWNER_ID}")
-
         print("Registered commands:")
         for name in self.commands:
             print(name)
@@ -62,8 +90,8 @@ class Bot(commands.Bot):
         chatter = payload.chatter.name
         text = payload.text
 
+        # Log every chat message in console
         print(f"{chatter}: {text}")
-
         await self.process_commands(payload)
 
 async def main():
