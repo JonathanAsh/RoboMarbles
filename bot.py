@@ -23,7 +23,6 @@ TWITCH_BOT_ACCESS_TOKEN = os.getenv("TWITCH_BOT_ACCESS_TOKEN")
 TWITCH_BOT_REFRESH_TOKEN = os.getenv("TWITCH_BOT_REFRESH_TOKEN")
 TWITCH_OWNER_ACCESS_TOKEN = os.getenv("TWITCH_OWNER_ACCESS_TOKEN")
 TWITCH_OWNER_REFRESH_TOKEN = os.getenv("TWITCH_OWNER_REFRESH_TOKEN")
-
 OBS_HOST = os.getenv("OBS_HOST", "localhost")
 OBS_PORT = int(os.getenv("OBS_PORT", "4455"))
 OBS_PASSWORD = os.getenv("OBS_PASSWORD")
@@ -49,19 +48,17 @@ class Bot(commands.Bot):
         )
 
     async def setup_hook(self) -> None:
-        # Two tokens, one for chat appearance (unused currently) and another for reading channel point redemptions
+        # Two tokens, one for chat appearance as robomarbles and another for reading channel point redemptions (need to be channel owner)
         await self.add_token(TWITCH_BOT_ACCESS_TOKEN, TWITCH_BOT_REFRESH_TOKEN)
         await self.add_token(TWITCH_OWNER_ACCESS_TOKEN, TWITCH_OWNER_REFRESH_TOKEN)
 
         # Load the commands from components
         await self.add_component(BasicCommands(self))
-        # Keep a reference to clapcommand component for channel point redemption uses
-        self.clap_commands = ClapCommands(self)
-        await self.add_component(self.clap_commands)
+        await self.add_component(ClapCommands(self))
         await self.add_component(TwitchPlays(self))
         await self.add_component(RedemptionEvents(self))
 
-        # Have a look at every chat message
+        # Watch every chat message
         await self.subscribe_websocket(
             payload=eventsub.ChatMessageSubscription(
                 broadcaster_user_id=TWITCH_OWNER_ID,
@@ -69,7 +66,7 @@ class Bot(commands.Bot):
             )
         )
 
-        # Have a look at every channel point redemption
+        # Watch every channel point redemption
         await self.subscribe_websocket(
             payload=eventsub.ChannelPointsRedeemAddSubscription(
                 broadcaster_user_id=TWITCH_OWNER_ID,

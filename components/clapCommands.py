@@ -35,23 +35,12 @@ class ClapCommands(commands.Component):
     
     #  ------------------------------------------------------------------------------------------------------#
 
-    ###----------###
-    ### COMMANDS ###
-    ###----------###
-
-    # Let chat control a Tomodachi Life style pair of clapping hands.
-    # The more people who type !clap, the longer it will clap for.
-    # WARNING: Claps may not be synced, not sure how to do this accurately.
-    @commands.command(name="clap")
-    async def clap_command(self, ctx):
-        await self.do_claps(random.randint(self.min_claps, self.max_claps))
-    
-    #  ------------------------------------------------------------------------------------------------------#
-
     ###-----------###
     ### LISTENERS ###
     ###-----------###
 
+    # Let chat control a Tomodachi Life style pair of clapping hands.
+    # The more people who type !clap, the longer it will clap for.
     # Listen for the Clap channel point redemption and play the clap
     @commands.Component.listener()
     async def event_custom_redemption_add(self, payload):
