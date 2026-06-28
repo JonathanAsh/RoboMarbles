@@ -15,14 +15,12 @@ class BasicCommands(commands.Component):
 
     # Switch to Be Right Back screen if mod or me
     @commands.command(name="brb")
+    @commands.is_moderator()
     async def brb_command(self, ctx):
-        if ctx.author.is_mod and ctx.author.name.lower() != "MarbleJelly".lower():
-            return
         self.bot.obs_client.set_current_program_scene("Be Right Back")
 
     # Switch to Main View screen if mod or me
     @commands.command(name="game")
+    @commands.is_moderator()
     async def game_command(self, ctx):
-        if ctx.author.is_mod and ctx.author.name.lower() != "MarbleJelly".lower():
-            return
         self.bot.obs_client.set_current_program_scene("Main View")
