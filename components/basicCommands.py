@@ -15,7 +15,7 @@ class BasicCommands(commands.Component):
     # Note: could i do this with the thing in bot.py which lists them?
     @commands.command(name="help")
     async def help_command(self, ctx):
-        await ctx.send("Current commands: !emotes to list all emotes, !discord for a link to the discord, !jump to hit spacebar, !up/down/left/right for WASD, !click to left click")
+        await ctx.send("Current commands: !emotes to list all emotes, !discord for a link to the discord, !controls to press my buttons")
 
     # Switch to Be Right Back screen if mod or me
     @commands.command(name="brb")
@@ -38,3 +38,8 @@ class BasicCommands(commands.Component):
     @commands.command(name="discord")
     async def discord_command(self, ctx):
         await ctx.send("https://discord.gg/4UaX9kJvd6")
+
+    # Displays just the input control commands
+    @commands.command(name="controls")
+    async def controls_command(self, ctx):
+        await ctx.send("!jump to hit spacebar, !up/down/left/right for WASD, !click to left click")

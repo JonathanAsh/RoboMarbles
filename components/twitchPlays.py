@@ -1,4 +1,5 @@
 # https://thepythoncode.com/article/control-keyboard-python
+# https://www.geeksforgeeks.org/python/mouse-library-in-python
 import keyboard
 import mouse
 
