@@ -42,4 +42,4 @@ class BasicCommands(commands.Component):
     # Displays just the input control commands
     @commands.command(name="controls")
     async def controls_command(self, ctx):
-        await ctx.send("!jump to hit spacebar, !up/down/left/right for WASD, !click to left click")
+        await ctx.send("!space to hit spacebar, !up/down/left/right for WASD, !click to left click")

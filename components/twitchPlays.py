@@ -19,8 +19,8 @@ class TwitchPlays(commands.Component):
     # Let chat use keyboard + mouse inputs with commands
     # Currently there is spacebar, WASD, and the left mouse button
     # May need to impose limits on this later.
-    @commands.command(name="jump")
-    async def jump_kb_command(self, ctx):
+    @commands.command(name="space")
+    async def space_kb_command(self, ctx):
         keyboard.send("space")
     
     @commands.command(name="click")
