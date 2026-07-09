@@ -1,5 +1,4 @@
 from twitchio.ext import commands
-import random
 
 class RedemptionEvents(commands.Component):
 

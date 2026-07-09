@@ -1,7 +1,6 @@
-# https://thepythoncode.com/article/control-keyboard-python
 # https://www.geeksforgeeks.org/python/mouse-library-in-python
-import keyboard
-import mouse
+import asyncio
+import pydirectinput
 
 from twitchio.ext import commands
 
@@ -21,24 +20,32 @@ class TwitchPlays(commands.Component):
     # May need to impose limits on this later.
     @commands.command(name="space")
     async def space_kb_command(self, ctx):
-        keyboard.send("space")
+        pydirectinput.press("space")
     
     @commands.command(name="click")
     async def leftclick_mb_command(self, ctx):
-        mouse.click("left")
+        pydirectinput.click()
 
     @commands.command(name="up")
     async def up_kb_command(self, ctx):
-        keyboard.send("w")
+        pydirectinput.keyDown("w")
+        await asyncio.sleep(0.5)
+        pydirectinput.keyUp("w")
 
     @commands.command(name="down")
     async def down_kb_command(self, ctx):
-        keyboard.send("s")
+        pydirectinput.keyDown("s")
+        await asyncio.sleep(0.5)
+        pydirectinput.keyUp("s")
 
     @commands.command(name="left")
     async def left_kb_command(self, ctx):
-        keyboard.send("a")
+        pydirectinput.keyDown("a")
+        await asyncio.sleep(0.5)
+        pydirectinput.keyUp("a")
 
     @commands.command(name="right")
     async def right_kb_command(self, ctx):
-        keyboard.send("d")
+        pydirectinput.keyDown("d")
+        await asyncio.sleep(0.5)
+        pydirectinput.keyUp("d")
