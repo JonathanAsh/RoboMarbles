@@ -20,7 +20,7 @@ class TwitchPlays(commands.Component):
     # May need to impose limits on this later.
     @commands.command(name="space")
     async def space_kb_command(self, ctx):
-        self.simulate_keypress("space", 0.2)
+        await self.simulate_keypress("space", 0.2)
     
     @commands.command(name="click")
     async def leftclick_mb_command(self, ctx):
@@ -28,19 +28,19 @@ class TwitchPlays(commands.Component):
 
     @commands.command(name="up")
     async def up_kb_command(self, ctx):
-        self.simulate_keypress("w", 0.5)
+        await self.simulate_keypress("w", 0.5)
 
     @commands.command(name="down")
     async def down_kb_command(self, ctx):
-        self.simulate_keypress("s", 0.5)
+        await self.simulate_keypress("s", 0.5)
 
     @commands.command(name="left")
     async def left_kb_command(self, ctx):
-        self.simulate_keypress("a", 0.5)
+        await self.simulate_keypress("a", 0.5)
 
     @commands.command(name="right")
     async def right_kb_command(self, ctx):
-        self.simulate_keypress("d", 0.5)
+        await self.simulate_keypress("d", 0.5)
 
     #  ------------------------------------------------------------------------------------------------------#
 
@@ -48,7 +48,7 @@ class TwitchPlays(commands.Component):
     ### HELPERS ###
     ###---------###
 
-    async def simulate_keypress(key, duration):
+    async def simulate_keypress(self, key, duration):
         pydirectinput.keyDown(key)
         await asyncio.sleep(duration)
         pydirectinput.keyUp(key)
