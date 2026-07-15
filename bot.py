@@ -12,6 +12,7 @@ from components.clapCommands import ClapCommands
 from components.twitchPlays import TwitchPlays
 from components.basicCommands import BasicCommands
 from components.redemptionEvents import RedemptionEvents
+from components.silentReadingTime import SilentReadingTime
 
 load_dotenv()
 
@@ -57,6 +58,7 @@ class Bot(commands.Bot):
         await self.add_component(ClapCommands(self))
         await self.add_component(TwitchPlays(self))
         await self.add_component(RedemptionEvents(self))
+        await self.add_component(SilentReadingTime(self))
 
         # Watch every chat message
         await self.subscribe_websocket(
@@ -74,16 +76,15 @@ class Bot(commands.Bot):
         )
 
     async def event_ready(self):
-        print(f"Logged in as bot user ID: {TWITCH_BOT_ID}")
-        print(f"Listening to channel user ID: {TWITCH_OWNER_ID}")
-        print("Registered commands:")
+        cmds = "Registered commands:"
         for name in self.commands:
-            print(name)
+            cmds += " " + name
+        print(cmds)
 
     async def event_message(self, payload):
         chatter = payload.chatter.name
         text = payload.text
-
+        
         # Log every chat message in console
         print(f"{chatter}: {text}")
         await self.process_commands(payload)

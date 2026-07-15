@@ -10,7 +10,7 @@ class ClapCommands(commands.Component):
         self.hands_apart_id = None
         self.hands_together_id = None
         self.clap_scene_id = None
-        self.load_clap_ids()
+        self.load_ids()
 
     #  ------------------------------------------------------------------------------------------------------#
 
@@ -132,7 +132,7 @@ class ClapCommands(commands.Component):
         )
 
     # Get clapping hand image IDs in case they change, along with ClapScene in Main View
-    def load_clap_ids(self):
+    def load_ids(self):
 
         # Hands ID (i think 55 and 56?)
         items = self.bot.obs_client.get_scene_item_list("ClapScene")
