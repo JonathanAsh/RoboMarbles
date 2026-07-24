@@ -1,8 +1,18 @@
+import aiohttp
 import asyncio
 import time
 import random
+import os
 
+from dotenv import load_dotenv
 from twitchio.ext import commands
+
+load_dotenv()
+
+TWITCH_BOT_ID = os.getenv("TWITCH_BOT_ID")
+TWITCH_OWNER_ID = os.getenv("TWITCH_OWNER_ID")
+TWITCH_CLIENT_ID = os.getenv("TWITCH_CLIENT_ID")
+TWITCH_BOT_ACCESS_TOKEN = os.getenv("TWITCH_BOT_ACCESS_TOKEN")
 
 class SilentReadingTime(commands.Component):
 
@@ -22,6 +32,19 @@ class SilentReadingTime(commands.Component):
         self.load_ids()
 
     LIBRARIAN_MODE_MAX_TIME = 600 # 10 minute timer for silent reading
+    EMOTES = [
+        "marble98Shh",
+        "marble98LOL",
+        "marble98Trash",
+        "marble98Explorer",
+        "marble98Scary",
+    ]
+    SHUSH_MESSAGES = [
+        "has been successfully shushed.",
+        "has received a stern look from the librarian.",
+        "has been escorted to the quiet reading corner.",
+        "has been relocated to the children's section as they cannot behave.",
+    ]
 
     #  ------------------------------------------------------------------------------------------------------#
 
@@ -37,6 +60,9 @@ class SilentReadingTime(commands.Component):
             await self.show_all_alert_boxes()
             await asyncio.sleep(3.5)
             await self.hide_all_alert_boxes()
+
+            # Give ten second warning
+            await payload.respond('in ten seconds, all uses of capital letters will be punished until silent reading time is over.')
             await asyncio.sleep(10)
 
             # Activate librarian mode
@@ -53,10 +79,16 @@ class SilentReadingTime(commands.Component):
         if time.time() > self.librarian_mode_timer:
             return
 
-        # timeout if any capitals in message
-        if message.text != message.text.lower():
-            await message.respond(f"/timeout {message.chatter.name} 30 no shouting in the library plink")
-            await message.respond(f"{message.chatter.name} has been successfully shushed. please respect silent reading time. crunch")
+        # Exclude only channel emotes (for subs and mods only?), aka those with the prefix "marble98" in them
+        text = message.text
+
+        for emote in self.EMOTES:
+            text = text.replace(emote, "")
+
+        # Delete message if any capitals and scold
+        if text != text.lower():
+            await self.delete_message(message.id)
+            await message.respond(f"{message.chatter.name.lower()} {random.choice(self.SHUSH_MESSAGES)} please respect silent reading time. crunch")
 
     #  ------------------------------------------------------------------------------------------------------#
 
@@ -180,3 +212,27 @@ class SilentReadingTime(commands.Component):
                 self.alert_7_id = item["sceneItemId"]
             elif item["sourceName"] == "SRT-alert-8":
                 self.alert_8_id = item["sceneItemId"]
+
+    async def delete_message(self, message_id: str):
+        url = "https://api.twitch.tv/helix/moderation/chat"
+
+        headers = {
+            "Authorization": f"Bearer {TWITCH_BOT_ACCESS_TOKEN}",
+            "Client-Id": TWITCH_CLIENT_ID,
+        }
+
+        params = {
+            "broadcaster_id": TWITCH_OWNER_ID,
+            "moderator_id": TWITCH_BOT_ID,
+            "message_id": message_id,
+        }
+
+        async with aiohttp.ClientSession() as session:
+            async with session.delete(
+                url,
+                headers=headers,
+                params=params,
+            ) as response:
+
+                if response.status != 204:
+                    print(await response.text())

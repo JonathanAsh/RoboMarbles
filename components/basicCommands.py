@@ -1,3 +1,5 @@
+import aiohttp
+
 from twitchio.ext import commands
 
 class BasicCommands(commands.Component):
